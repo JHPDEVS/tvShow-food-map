@@ -19,7 +19,7 @@ function App() {
       <div class="hero min-h-screen ">
         <div class="hero-content text-center">
           <div class="max-w-md">
-            <div className=" animate-[bounce_6s_ease-in-out_infinite]">
+            <div className=" animate-[bounce_5s_ease-in-out_infinite]">
               <img src={logo} />
               <h2 className="text-white font-bold text-2xl">
                 방송에서 나온 맛집을 찾아보세요!
@@ -28,11 +28,11 @@ function App() {
 
             <div class="flex justify-center mt-3">
               <button class="text-white text-2xl font-bold"></button>
-              <div class="alert shadow-lg items-center justify-center">
-                <button class="alert btn ">
-                  <Link to="/main">접속하기</Link>
-                </button>
-              </div>
+              <Link to="/main">
+                <div class="alert shadow-lg items-center justify-center text-4xl transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300 ">
+                  🔍
+                </div>
+              </Link>
             </div>
           </div>
         </div>
