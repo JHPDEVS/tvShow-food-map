@@ -72,31 +72,36 @@ function Main() {
               </div>
             </div>
           </ul>
-          <div class="overflow-y-auto  h-[calc(80vh)] w-full">
-            <table class="table w-full text-center">
-              {stores && !loading && typeValue == 'gm'
-                ? stores.map((store, index) => (
-                    <div class="overflow-x-auto">
-                      {index == 0 ? (
-                        <thead>
-                          <tr>
-                            <th>지역</th>
-                            <th>가게명</th>
-                            <th>메뉴</th>
-                          </tr>
-                        </thead>
-                      ) : null}
-
-                      <tbody className="w-full">
-                        <tr>
-                          <th>{store.지역1}</th>
-                          <td>{store.가게명}</td>
-                          <td>{store.메뉴}</td>
-                        </tr>
-                      </tbody>
-                    </div>
-                  ))
-                : null}
+          <div class="overflow-y-auto h-[calc(80vh)] overflow-x-hidden">
+            <table class="w-full table-fixed text-sm text-center text-gray-500 dark:text-gray-400">
+              <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
+                <tr>
+                  <th scope="col" class="px-6 py-4 rounded-l-lg">
+                    지역
+                  </th>
+                  <th scope="col" class="">
+                    가게명
+                  </th>
+                  <th scope="col" class="rounded-r-lg">
+                    메뉴
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {stores && !loading && typeValue == 'gm'
+                  ? stores.map((store, index) => (
+                      <tr class="bg-white dark:bg-gray-800">
+                        <td className="px-6 py-4 rounded-l-lg">
+                          {store.지역1}
+                        </td>
+                        <td className="font-bold">{store.가게명}</td>
+                        <td className="overflow-hidden text-ellipsis rounded-r-lg">
+                          {store.메뉴}
+                        </td>
+                      </tr>
+                    ))
+                  : null}
+              </tbody>
             </table>
           </div>
         </div>
