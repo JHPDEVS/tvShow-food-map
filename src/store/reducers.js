@@ -27,7 +27,7 @@ export default handleActions(
       return {
         store_pending: false,
         store_pending: action.payload,
-        error: false,
+        error: true,
       }
     },
   },
