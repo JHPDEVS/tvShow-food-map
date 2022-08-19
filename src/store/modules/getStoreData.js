@@ -6,7 +6,7 @@ const GET_STORES_SUCCESS = 'GET_STORES_SUCCESS'
 const GET_STORES_FAILURE = 'GET_STORES_FAILURE'
 
 function getAPI(type) {
-  return axios.get(`http://localhost:3001/gm`)
+  return axios.get(`http://143.198.237.8:3000/api/gm`)
 }
 
 export const getStoreData = type => async dispatch => {

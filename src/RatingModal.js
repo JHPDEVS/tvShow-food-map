@@ -11,7 +11,7 @@ function RatingModal(props) {
   const [password, setPassword] = useState(5)
   const addRate = () => {
     axios
-      .post('http://localhost:3001/rate', {
+      .post('http://143.198.237.8:3000/api/rate', {
         address_id: props.value.address_id,
         value: ratingValue,
         password: password,

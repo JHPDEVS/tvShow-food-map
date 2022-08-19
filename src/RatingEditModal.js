@@ -9,7 +9,7 @@ function RatingEditModal(props) {
   const [ratingValue, setRatingValue] = useState()
   const editRate = () => {
     axios
-      .put(`http://localhost:3001/rate/${props.value.id}`, {
+      .put(`http://143.198.237.8:3000/api/rate/${props.value.id}`, {
         address_id: props.value.address_id,
         value: ratingValue,
         password: props.value.password,
