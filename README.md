@@ -7,7 +7,9 @@ frontend : npm start
 
 backend(json-server) : json-server --watch db.json --port 3000 
 
-현재 json-server가 http://143.198.237.8:3000 에 올라간 상태입니다.
-자세한 내용을 확인할려면 http://143.198.237.8:3000/ui를 확인해주세요.
+현재 json-server가 https://api.ckme.live 에 올라간 상태입니다.
+
+가게 json https://api.ckme.live/gm
+별점 json https://api.ckme.live/rate
 
 Demo site: https://ckme.live
