@@ -12,26 +12,43 @@ import { CogIcon } from '@heroicons/react/solid'
 import markerImg from './img/marker_yju.png'
 import YouTube from 'react-youtube'
 import RatingModal from './RatingModal'
-import { Rating } from '@mui/material'
+import RatingCheck from './RatingCheck'
+import RatingEditModal from './RatingEditModal'
 function Main() {
   const [visible, setVisible] = useState(true)
   const [typeValue, setType] = useState('골목식당')
   const [storeList, setStoreList] = useState([])
   const [open, setOpen] = useState(false)
+  const [open2, setOpen2] = useState(false)
+  const [open3, setOpen3] = useState(false)
   const stores = useSelector(state => state.Reducers.stores)
   const loading = useSelector(state => state.Reducers.store_pending)
   const dispatch = useDispatch()
   const [info, setInfo] = useState()
-  const [rates, setRates] = useState({})
+  const [rates, setRates] = useState([])
   const [markers, setMarkers] = useState([])
   const [map, setMap] = useState()
   const [youtubeURL, setYoutubeURL] = useState('null')
+  const [count, setCount] = useState(0)
+  const [sum, setSum] = useState(0)
+  const [currentEditRate, setCurrentEditRate] = useState(null)
   const handleOpen = () => {
     setOpen(true)
     console.log('열기')
   }
+  const handleOpen3 = rate => {
+    setCurrentEditRate(rate)
+    setOpen3(true)
+    console.log('열기')
+  }
   const handleClose = e => {
     setOpen(false)
+  }
+  const handleClose2 = e => {
+    setOpen2(false)
+  }
+  const handleClose3 = e => {
+    setOpen3(false)
   }
   useEffect(() => {
     dispatch(getStoreData(typeValue))
@@ -110,16 +127,29 @@ function Main() {
       .get(`http://localhost:3001/rate?address_id=${address_id}`)
       .then(res => {
         console.log(res.data)
-        let count = 0
-        let value = 0
+        let sum = 0
         res.data.map((rate, index) => {
-          count += count + 1
-          value += rate.value
+          sum += rate.value
         })
+
+        setSum(sum)
+
         setRates(res.data)
+        setCount(res.data.length)
       })
   }
-
+  const getRateByName = name => {
+    axios.get(`http://localhost:3001/rate?name=${name}`).then(res => {
+      console.log(res.data)
+      let sum = 0
+      res.data.map((rate, index) => {
+        sum += rate.value
+      })
+      setRates(res.data)
+      setSum(sum)
+      setCount(res.data.length)
+    })
+  }
   const mapSearch = object => {
     if (!map) return
     const ps = new kakao.maps.services.Places()
@@ -198,7 +228,12 @@ function Main() {
           <div>
             {stores != null ? (
               <>
-                <Table columns={columns} data={data} mapSearch={mapSearch} />
+                <Table
+                  columns={columns}
+                  data={data}
+                  mapSearch={mapSearch}
+                  getRate={getRateByName}
+                />
               </>
             ) : (
               <h1 class="loading">없음</h1>
@@ -244,7 +279,7 @@ function Main() {
                   }}
                 >
                   {info && info.address_id === marker.address_id && (
-                    <div class=" w-full bg-base-100 shadow-xl">
+                    <div class=" w-96 bg-base-100 shadow-xl">
                       <figure>
                         {youtubeURL ? (
                           <YouTube
@@ -273,8 +308,45 @@ function Main() {
                       </figure>
                       <div class="card-body">
                         <h2 class="card-title">{marker.content}</h2>
-                        <Rating name="read-only" value={3} readOnly />
-                        <div onClick={() => handleOpen()}>별점주기</div>
+                        <div className="flex">
+                          <div class="flex items-center">
+                            <svg
+                              aria-hidden="true"
+                              class="w-5 h-5 text-yellow-400"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <title>Rating star</title>
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <p class="ml-2 text-sm font-bold text-gray-900 dark:text-white">
+                              {(sum / count).toFixed(2)}
+                            </p>
+                            <span class="w-1 h-1 mx-1.5 bg-gray-500 rounded-full dark:bg-gray-400"></span>
+                            <a
+                              href="#"
+                              class="text-sm font-medium text-gray-900 underline hover:no-underline dark:text-white"
+                            >
+                              {count}명
+                            </a>
+                          </div>
+                        </div>
+                        <div className="w-full flex">
+                          <button
+                            onClick={() => handleOpen()}
+                            className="btn text-white font-bold"
+                          >
+                            별점주기
+                          </button>
+                          <button
+                            onClick={() => setOpen2(true)}
+                            className="btn ml-2 text-white btn-error font-bold"
+                          >
+                            별점확인
+                          </button>
+                        </div>
+
                         <div class="text-sm breadcrumbs">
                           <ul>
                             <li>
@@ -302,10 +374,16 @@ function Main() {
                             </li>
                           </ul>
                         </div>
-                        <p class="text-2xl font-bold">{marker.address_name}</p>
+                        <p class="text-sm font-bold">{marker.address_name}</p>
                         <p>{marker.phone}</p>
                         <div class="card-actions justify-end">
-                          <button class="btn ">카카오맵에서 보기</button>
+                          <a
+                            class="font-bold px-4 py-2 bg-transparent outline-none border-2 border-indigo-400 rounded text-indigo-500 active:scale-95 hover:bg-indigo-600 hover:text-white hover:border-transparent focus:bg-indigo-400 focus:text-white focus:border-transparent focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 disabled:bg-gray-400/80 disabled:shadow-none disabled:cursor-not-allowed transition-colors duration-200"
+                            target="_blank"
+                            href={marker.place_url}
+                          >
+                            카카오맵에서 보기
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -315,7 +393,27 @@ function Main() {
             ))}
           </Map>
         </div>
-        <RatingModal open={open} handleClose={handleClose} value={info} />
+        <RatingModal
+          open={open}
+          handleClose={handleClose}
+          getRate={getRate}
+          value={info}
+        />
+        <RatingCheck
+          open={open2}
+          openEditModal={handleOpen3}
+          handleClose={handleClose2}
+          rates={rates}
+          value={info}
+          getRate={getRate}
+        />
+
+        <RatingEditModal
+          open={open3}
+          handleClose={handleClose3}
+          value={currentEditRate}
+          getRate={getRate}
+        />
         {/* <div>
           <ul class="fixed right-0 bottom-0 z-50">
             <div class="min-w-full overflow-y-auto bg-white card mx-auto">

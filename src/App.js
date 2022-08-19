@@ -4,6 +4,7 @@ import bg2 from './img/bg2.gif'
 import bg3 from './img/bg3.gif'
 import logo from './img/food_map.png'
 import Button from './Button.js'
+import './App.css'
 import { Link } from 'react-router-dom'
 const backgroundArr = [bg, bg2, bg3]
 const randomIndex = Math.floor(Math.random() * backgroundArr.length)
@@ -28,8 +29,8 @@ function App() {
 
             <div class="flex justify-center mt-3">
               <button class="text-white text-2xl font-bold"></button>
-              <Link to="/main">
-                <div class="alert shadow-lg items-center justify-center text-4xl transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300 ">
+              <Link to="/map">
+                <div class="alert shadow-lg items-center justify-center text-5xl transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300 ">
                   🔍
                 </div>
               </Link>

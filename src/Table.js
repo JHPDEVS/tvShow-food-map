@@ -12,11 +12,12 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronDoubleRightIcon,
+  CogIcon,
 } from '@heroicons/react/solid'
 import { Button, PageButton } from './shared/Button'
 import { classNames } from './shared/Utils'
 import { SortIcon, SortUpIcon, SortDownIcon } from './shared/Icons'
-
+import './dist/output.css'
 // Define a default UI for filtering
 function GlobalFilter({
   preGlobalFilteredRows,
@@ -28,7 +29,6 @@ function GlobalFilter({
   const onChange = useAsyncDebounce(value => {
     setGlobalFilter(value || undefined)
   }, 200)
-
   return (
     <div class="mx-3 mt-3">
       <div class="relative text-gray-600">
@@ -136,7 +136,7 @@ export function AvatarCell({ value, column, row }) {
   )
 }
 
-function Table({ columns, data }) {
+function Table({ columns, data, mapSearch, getRate }) {
   // Use the state and functions returned from useTable to build your UI
   const {
     getTableProps,
@@ -154,7 +154,7 @@ function Table({ columns, data }) {
     gotoPage,
     nextPage,
     previousPage,
-    setPageSize,
+    setPageSize = 5,
 
     state,
     preGlobalFilteredRows,
@@ -190,84 +190,84 @@ function Table({ columns, data }) {
         )}
       </div>
       {/* table */}
-      <div className="mt-4 flex flex-col">
-        <div className="-my-2 overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
-          <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-              <table
-                {...getTableProps()}
-                className="w-full table-fixed text-sm text-center text-gray-500 dark:text-gray-400  h-[calc(71vh)]"
-              >
-                <thead className="bg-gray-50 ">
-                  {headerGroups.map(headerGroup => (
-                    <tr {...headerGroup.getHeaderGroupProps()}>
-                      {headerGroup.headers.map(column => (
-                        // Add the sorting props to control sorting. For this example
-                        // we can add them into the header props
-                        <th
-                          scope="col"
-                          className="group px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                          {...column.getHeaderProps(
-                            column.getSortByToggleProps()
-                          )}
-                        >
-                          <div className="flex items-center justify-between">
-                            {column.render('Header')}
-                            {/* Add a sort direction indicator */}
-                            <span>
-                              {column.isSorted ? (
-                                column.isSortedDesc ? (
-                                  <SortDownIcon className="w-4 h-4 text-gray-400" />
-                                ) : (
-                                  <SortUpIcon className="w-4 h-4 text-gray-400" />
-                                )
-                              ) : (
-                                <SortIcon className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100" />
-                              )}
-                            </span>
-                          </div>
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                <tbody
-                  {...getTableBodyProps()}
-                  className="bg-white divide-y divide-gray-200"
-                >
-                  {page.map((row, i) => {
-                    // new
-                    prepareRow(row)
-                    return (
-                      <tr {...row.getRowProps()}>
-                        {row.cells.map(cell => {
-                          return (
-                            <td
-                              {...cell.getCellProps()}
-                              className="overflow-hidden text-ellipsis rounded-r-lg"
-                              role="cell"
-                            >
-                              {cell.column.Cell.name === 'defaultRenderer' ? (
-                                <div className="text-sm text-gray-500">
-                                  {cell.render('Cell')}
-                                </div>
-                              ) : (
-                                cell.render('Cell')
-                              )}
-                            </td>
+      <div class="container overflow-y-auto h-[calc(100vh-100px)] overflow-x-hidden">
+        <table
+          {...getTableProps()}
+          className="mt-2 w-full table-fixed  text-center text-gray-500 dark:text-gray-400"
+        >
+          <thead className="bg-gray-50 sticky top-0">
+            {headerGroups.map(headerGroup => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => (
+                  // Add the sorting props to control sorting. For this example
+                  // we can add them into the header props
+                  <th
+                    scope="col"
+                    className="group px-5 py-3  text-xs font-bold  text-gray-500 uppercase tracking-wider"
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                  >
+                    <div className="flex items-center justify-between">
+                      {column.render('Header')}
+                      {/* Add a sort direction indicator */}
+                      <span>
+                        {column.isSorted ? (
+                          column.isSortedDesc ? (
+                            <SortDownIcon className="w-4 h-4 text-gray-400" />
+                          ) : (
+                            <SortUpIcon className="w-4 h-4 text-gray-400" />
                           )
-                        })}
-                      </tr>
+                        ) : (
+                          <SortIcon className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100" />
+                        )}
+                      </span>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+
+          <tbody
+            {...getTableBodyProps()}
+            className="bg-white divide-y divide-gray-200"
+          >
+            {page.map((row, i) => {
+              // new
+              prepareRow(row)
+              return (
+                <tr
+                  className="bg-white dark:bg-gray-800"
+                  {...row.getRowProps()}
+                  onClick={() => {
+                    mapSearch(row)
+                    getRate(row.original.가게명)
+                  }}
+                >
+                  {row.cells.map(cell => {
+                    return (
+                      <td
+                        {...cell.getCellProps()}
+                        className=" rounded-r-lg"
+                        role="cell"
+                      >
+                        {cell.column.Cell.name === 'defaultRenderer' ? (
+                          <span className="text-sm text-gray-500">
+                            {cell.render('Cell')}
+                          </span>
+                        ) : (
+                          cell.render('Cell')
+                        )}
+                      </td>
                     )
                   })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
       {/* Pagination */}
-      <div className="py-2 flex items-center justify-between">
+      <div className="sticky bottom-0 py-2 flex items-center justify-between">
         <div className="flex-1 flex justify-between sm:hidden">
           <Button onClick={() => previousPage()} disabled={!canPreviousPage}>
             Previous
@@ -277,15 +277,15 @@ function Table({ columns, data }) {
           </Button>
         </div>
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div className="flex gap-x-2 items-baseline">
-            <span className="text-sm text-gray-700">
-              Page <span className="font-medium">{state.pageIndex + 1}</span> of{' '}
-              <span className="font-medium">{pageOptions.length}</span>
+          <div className="flex items-baseline">
+            <span className="text-sm text-gray-700 p-2">
+              <span className="font-medium">{state.pageIndex + 1}페이지</span> /{' '}
+              <span className="font-medium">{pageOptions.length}페이지</span>
             </span>
           </div>
           <div>
             <nav
-              className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+              className="relative z-0 inline-flex rounded-md shadow-sm px-2"
               aria-label="Pagination"
             >
               <PageButton
