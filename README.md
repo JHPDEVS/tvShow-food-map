@@ -13,3 +13,4 @@ backend(json-server) : json-server --watch db.json --port 3000
 별점 json https://api.ckme.live/rate
 
 Demo site: https://ckme.live
+![image](https://user-images.githubusercontent.com/30117732/185651859-ea4f2204-421c-496a-b07b-18a0b6a3b15f.png)
