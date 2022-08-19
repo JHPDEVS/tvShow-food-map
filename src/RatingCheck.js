@@ -8,7 +8,7 @@ function RatingCheck(props) {
   const [ratingValue, setRatingValue] = useState()
   const deleteRate = (id, address_id) => {
     axios
-      .delete(`http://143.198.237.8:3000/api/rate/${id}`)
+      .delete(`https://api.ckme.live/rate/${id}`)
       .then(res => {
         alert('삭제 성공')
         props.getRate(address_id)
