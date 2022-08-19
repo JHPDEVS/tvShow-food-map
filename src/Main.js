@@ -124,7 +124,7 @@ function Main() {
 
   const getRate = address_id => {
     axios
-      .get(`http://localhost:3001/rate?address_id=${address_id}`)
+      .get(`https://api.ckme.live/rate?address_id=${address_id}`)
       .then(res => {
         console.log(res.data)
         let sum = 0
@@ -139,7 +139,7 @@ function Main() {
       })
   }
   const getRateByName = name => {
-    axios.get(`http://localhost:3001/rate?name=${name}`).then(res => {
+    axios.get(`https://api.ckme.live/rate?name=${name}`).then(res => {
       console.log(res.data)
       let sum = 0
       res.data.map((rate, index) => {
