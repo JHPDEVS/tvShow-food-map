@@ -4,36 +4,19 @@ import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { Dialog, Transition } from '@headlessui/react'
 import { Rating } from '@mui/material'
-function RatingModal(props) {
+function RatingCheck(props) {
   const [ratingValue, setRatingValue] = useState()
-  const [nickname, setNickName] = useState('천세백세준')
-  const [comment, setComment] = useState('리뷰를 남겨주세요')
-  const [password, setPassword] = useState(5)
-  const addRate = () => {
+  const deleteRate = (id, address_id) => {
     axios
-      .post('http://localhost:3001/rate', {
-        address_id: props.value.address_id,
-        value: ratingValue,
-        password: password,
-        nickname: '익명의 사나이',
-        comment: comment,
-        name: props.value.content,
-      })
+      .delete(`http://localhost:3001/rate/${id}`)
       .then(res => {
-        alert('성공')
-        props.getRate(props.value.address_id)
-        props.handleClose()
+        alert('삭제 성공')
+        props.getRate(address_id)
       })
       .catch(err => {
         alert(err)
       })
   }
-
-  useEffect(() => {
-    return () => {
-      console.log('타이핑')
-    }
-  }, [comment])
   return (
     <Transition appear show={props.open} as={Fragment}>
       <Dialog
@@ -94,48 +77,50 @@ function RatingModal(props) {
               </div>
               <div className="mx-auto">
                 <div className="font-bold text-xl p-2 oveflow-x-auto">
-                  별점주기
+                  별점확인
                 </div>
                 <div className="flex flex-col overflow-y-auto h-96 px-2">
                   <article>
-                    <div class="flex items-center mb-1">
-                      <Rating
-                        name="simple-controlled"
-                        value={ratingValue}
-                        onChange={(event, newValue) => {
-                          setRatingValue(newValue)
-                        }}
-                      />
-                      <h3 class="ml-2 text-sm font-semibold text-gray-900 dark:text-white">
-                        {ratingValue}개
-                      </h3>
-                    </div>
-
-                    <div class="py-2 px-4 bg-gray rounded-b-lg dark:bg-gray-800">
-                      <label for="editor" class="sr-only">
-                        Publish post
-                      </label>
-                      <textarea
-                        id="editor"
-                        rows="8"
-                        class="block px-0 w-full text-sm text-gray-800 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
-                        placeholder="코멘트를 입력해주세요"
-                        required
-                        value={comment}
-                        onChange={event => {
-                          setComment(event.target.value)
-                        }}
-                      ></textarea>
-                    </div>
+                    {props && props.rates
+                      ? props.rates.map((rate, index) => {
+                          return (
+                            <div class="flex items-center mb-4 space-x-4">
+                              <div class="w-full space-y-1 font-medium dark:text-white">
+                                <p>{rate.nickname} </p>
+                                <p class="mb-2 font-light text-gray-500 dark:text-gray-400">
+                                  {rate.comment}
+                                </p>
+                                <Rating value={rate.value}></Rating>
+                              </div>
+                              <div className="w-full flex">
+                                <button
+                                  onClick={() => props.openEditModal(rate)}
+                                  className="btn text-white font-bold"
+                                >
+                                  별점수정
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    deleteRate(rate.id, rate.address_id)
+                                  }
+                                  className="btn ml-2 text-white btn-error font-bold"
+                                >
+                                  별점삭제
+                                </button>
+                              </div>
+                            </div>
+                          )
+                        })
+                      : null}
                   </article>
                 </div>
               </div>
               <div className="flex justify-center py-2">
                 <button
-                  onClick={() => addRate()}
+                  onClick={props.handleClose}
                   className=" px-4 py-2 text-sm font-medium text-red-900 bg-red-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                 >
-                  보내기
+                  확인
                 </button>
               </div>
             </div>
@@ -145,4 +130,4 @@ function RatingModal(props) {
     </Transition>
   )
 }
-export default RatingModal
+export default RatingCheck

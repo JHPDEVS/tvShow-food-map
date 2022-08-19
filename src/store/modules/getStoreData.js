@@ -6,9 +6,7 @@ const GET_STORES_SUCCESS = 'GET_STORES_SUCCESS'
 const GET_STORES_FAILURE = 'GET_STORES_FAILURE'
 
 function getAPI(type) {
-  return axios.get(
-    `https://a38eab6e-4c62-43d3-b0c9-d33b367af551.mock.pstmn.io/${type}`
-  )
+  return axios.get(`http://localhost:3001/gm`)
 }
 
 export const getStoreData = type => async dispatch => {

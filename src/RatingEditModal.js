@@ -4,23 +4,21 @@ import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { Dialog, Transition } from '@headlessui/react'
 import { Rating } from '@mui/material'
-function RatingModal(props) {
+function RatingEditModal(props) {
+  const [comment, setComment] = useState()
   const [ratingValue, setRatingValue] = useState()
-  const [nickname, setNickName] = useState('천세백세준')
-  const [comment, setComment] = useState('리뷰를 남겨주세요')
-  const [password, setPassword] = useState(5)
-  const addRate = () => {
+  const editRate = () => {
     axios
-      .post('http://localhost:3001/rate', {
+      .put(`http://localhost:3001/rate/${props.value.id}`, {
         address_id: props.value.address_id,
         value: ratingValue,
-        password: password,
+        password: props.value.password,
         nickname: '익명의 사나이',
-        comment: comment,
         name: props.value.content,
+        comment: comment,
       })
       .then(res => {
-        alert('성공')
+        alert('수정성공')
         props.getRate(props.value.address_id)
         props.handleClose()
       })
@@ -31,9 +29,16 @@ function RatingModal(props) {
 
   useEffect(() => {
     return () => {
-      console.log('타이핑')
+      setComment(props.value.comment)
+      setRatingValue(props.value.value)
     }
-  }, [comment])
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      console.log('updated')
+    }
+  }, [comment, ratingValue])
   return (
     <Transition appear show={props.open} as={Fragment}>
       <Dialog
@@ -94,7 +99,7 @@ function RatingModal(props) {
               </div>
               <div className="mx-auto">
                 <div className="font-bold text-xl p-2 oveflow-x-auto">
-                  별점주기
+                  별점 수정하기
                 </div>
                 <div className="flex flex-col overflow-y-auto h-96 px-2">
                   <article>
@@ -132,10 +137,10 @@ function RatingModal(props) {
               </div>
               <div className="flex justify-center py-2">
                 <button
-                  onClick={() => addRate()}
+                  onClick={() => editRate()}
                   className=" px-4 py-2 text-sm font-medium text-red-900 bg-red-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                 >
-                  보내기
+                  수정하기
                 </button>
               </div>
             </div>
@@ -145,4 +150,4 @@ function RatingModal(props) {
     </Transition>
   )
 }
-export default RatingModal
+export default RatingEditModal
