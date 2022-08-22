@@ -9,7 +9,7 @@ function RatingEditModal(props) {
   const [ratingValue, setRatingValue] = useState()
   const editRate = () => {
     axios
-      .put(`https://api.ckme.live/rate/${props.value.id}`, {
+      .put(`https://api.2park.shop/rate/${props.value.id}`, {
         address_id: props.value.address_id,
         value: ratingValue,
         password: props.value.password,

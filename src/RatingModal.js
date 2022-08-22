@@ -11,7 +11,7 @@ function RatingModal(props) {
   const [password, setPassword] = useState(5)
   const addRate = () => {
     axios
-      .post('https://api.ckme.live/rate', {
+      .post('https://api.2park.shop/rate', {
         address_id: props.value.address_id,
         value: ratingValue,
         password: password,
