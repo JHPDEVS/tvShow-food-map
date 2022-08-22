@@ -6,7 +6,7 @@ const GET_STORES_SUCCESS = 'GET_STORES_SUCCESS'
 const GET_STORES_FAILURE = 'GET_STORES_FAILURE'
 
 function getAPI(type) {
-  return axios.get(`https://2park.shop/gm`)
+  return axios.get(`https://api.2park.shop/gm`)
 }
 
 export const getStoreData = type => async dispatch => {
