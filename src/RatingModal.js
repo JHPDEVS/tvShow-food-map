@@ -11,7 +11,7 @@ function RatingModal(props) {
   const [password, setPassword] = useState(5);
   const addRate = () => {
     axios
-      .post("https://json.jhpdev.xyz/rate", {
+      .post("https://jhpdev.xyz/proxy/https://json.jhpdev.xyz/rate", {
         address_id: props.value.address_id,
         value: ratingValue,
         password: password,

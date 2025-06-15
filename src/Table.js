@@ -12,13 +12,13 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronDoubleRightIcon,
-  CogIcon,
 } from "@heroicons/react/solid";
 import { Button, PageButton } from "./shared/Button";
 import { classNames } from "./shared/Utils";
 import { SortIcon, SortUpIcon, SortDownIcon } from "./shared/Icons";
 import "./dist/output.css";
-// Define a default UI for filtering
+
+// グローバルフィルターUI
 function GlobalFilter({
   preGlobalFilteredRows,
   globalFilter,
@@ -29,18 +29,19 @@ function GlobalFilter({
   const onChange = useAsyncDebounce((value) => {
     setGlobalFilter(value || undefined);
   }, 200);
+
   return (
-    <div class="mx-3 mt-3">
-      <div class="relative text-gray-600">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-2">
+    <div className="mx-3 mt-3">
+      <div className="relative text-gray-600">
+        <span className="absolute inset-y-0 left-0 flex items-center pl-2">
           <svg
             fill="none"
             stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
             viewBox="0 0 24 24"
-            class="w-6 h-6 text-gray-300"
+            className="w-6 h-6 text-gray-300"
           >
             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
@@ -53,100 +54,21 @@ function GlobalFilter({
             setValue(e.target.value);
             onChange(e.target.value);
           }}
-          placeholder={`${count} 개의 가게가 있습니다.`}
+          placeholder={`${count} 件のお店があります.`}
         />
       </div>
     </div>
   );
 }
 
-// This is a custom filter UI for selecting
-// a unique option from a list
-export function SelectColumnFilter({
-  column: { filterValue, setFilter, preFilteredRows, id, render },
-}) {
-  // Calculate the options for filtering
-  // using the preFilteredRows
-  const options = React.useMemo(() => {
-    const options = new Set();
-    preFilteredRows.forEach((row) => {
-      options.add(row.values[id]);
-    });
-    return [...options.values()];
-  }, [id, preFilteredRows]);
-
-  // Render a multi-select box
-  return (
-    <label className="flex gap-x-2 items-baseline">
-      <span className="text-gray-700">{render("Header")}: </span>
-      <select
-        className="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        name={id}
-        id={id}
-        value={filterValue}
-        onChange={(e) => {
-          setFilter(e.target.value || undefined);
-        }}
-      >
-        <option value="">All</option>
-        {options.map((option, i) => (
-          <option key={i} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
-export function StatusPill({ value }) {
-  const status = value ? value.toLowerCase() : "unknown";
-
-  return (
-    <span
-      className={classNames(
-        "px-3 py-1 uppercase leading-wide font-bold text-xs rounded-full shadow-sm",
-        status.startsWith("active") ? "bg-green-100 text-green-800" : null,
-        status.startsWith("inactive") ? "bg-yellow-100 text-yellow-800" : null,
-        status.startsWith("offline") ? "bg-red-100 text-red-800" : null
-      )}
-    >
-      {status}
-    </span>
-  );
-}
-
-export function AvatarCell({ value, column, row }) {
-  return (
-    <div className="flex items-center">
-      <div className="flex-shrink-0 h-10 w-10">
-        <img
-          className="h-10 w-10 rounded-full"
-          src={row.original[column.imgAccessor]}
-          alt=""
-        />
-      </div>
-      <div className="ml-4">
-        <div className="text-sm font-medium text-gray-900">{value}</div>
-        <div className="text-sm text-gray-500">
-          {row.original[column.emailAccessor]}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Table({ columns, data, mapSearch, getRate }) {
-  // Use the state and functions returned from useTable to build your UI
+// テーブルコンポーネント
+function Table({ columns, data, mapSearch, getRate, onRowClick }) {
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    page, // Instead of using 'rows', we'll use page,
-    // which has only the rows for the active page
-
-    // The rest of these things are super handy, too ;)
+    page,
     canPreviousPage,
     canNextPage,
     pageOptions,
@@ -154,23 +76,20 @@ function Table({ columns, data, mapSearch, getRate }) {
     gotoPage,
     nextPage,
     previousPage,
-    setPageSize = 5,
-
-    state,
-    preGlobalFilteredRows,
     setGlobalFilter,
+    preGlobalFilteredRows,
+    state,
   } = useTable(
     {
       columns,
       data,
     },
-    useFilters, // useFilters!
+    useFilters,
     useGlobalFilter,
     useSortBy,
-    usePagination // new
+    usePagination
   );
 
-  // Render the UI for your table
   return (
     <>
       <div className="w-full">
@@ -189,26 +108,22 @@ function Table({ columns, data, mapSearch, getRate }) {
           )
         )}
       </div>
-      {/* table */}
-      <div class="container overflow-y-auto h-[calc(100vh-100px)] overflow-x-hidden">
+      <div className="container overflow-y-auto h-[calc(100vh-100px)] overflow-x-hidden">
         <table
           {...getTableProps()}
-          className="mt-2 w-full table-fixed  text-center text-gray-500 dark:text-gray-400"
+          className="mt-2 w-full table-fixed text-center text-gray-500 dark:text-gray-400"
         >
           <thead className="bg-gray-50 sticky top-0">
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  // Add the sorting props to control sorting. For this example
-                  // we can add them into the header props
                   <th
                     scope="col"
-                    className="group px-5 py-3  text-xs font-bold  text-gray-500 uppercase tracking-wider"
+                    className="group px-5 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider"
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                   >
                     <div className="flex items-center justify-between">
                       {column.render("Header")}
-                      {/* Add a sort direction indicator */}
                       <span>
                         {column.isSorted ? (
                           column.isSortedDesc ? (
@@ -231,42 +146,29 @@ function Table({ columns, data, mapSearch, getRate }) {
             {...getTableBodyProps()}
             className="bg-white divide-y divide-gray-200"
           >
-            {page.map((row, i) => {
-              // new
+            {page.map((row) => {
               prepareRow(row);
               return (
                 <tr
-                  className="bg-white dark:bg-gray-800"
                   {...row.getRowProps()}
                   onClick={() => {
+                    console.log(row);
+                    onRowClick(row);
                     mapSearch(row);
-                    getRate(row.original.가게명_jp);
+                    getRate(row.original.가게명);
                   }}
                 >
-                  {row.cells.map((cell) => {
-                    return (
-                      <td
-                        {...cell.getCellProps()}
-                        className=" rounded-r-lg"
-                        role="cell"
-                      >
-                        {cell.column.Cell.name === "defaultRenderer" ? (
-                          <span className="text-sm text-gray-500">
-                            {cell.render("Cell")}
-                          </span>
-                        ) : (
-                          cell.render("Cell")
-                        )}
-                      </td>
-                    );
-                  })}
+                  {row.cells.map((cell) => (
+                    <td {...cell.getCellProps()} className="rounded-r-lg">
+                      {cell.render("Cell")}
+                    </td>
+                  ))}
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-      {/* Pagination */}
       <div className="sticky bottom-0 py-2 flex items-center justify-between">
         <div className="flex-1 flex justify-between sm:hidden">
           <Button onClick={() => previousPage()} disabled={!canPreviousPage}>

@@ -6,7 +6,7 @@ const GET_STORES_SUCCESS = "GET_STORES_SUCCESS";
 const GET_STORES_FAILURE = "GET_STORES_FAILURE";
 
 function getAPI(type) {
-  return axios.get(`https://json.jhpdev.xyz/gm`);
+  return axios.get(`https://jhpdev.xyz/proxy/https://json.jhpdev.xyz/gm`);
 }
 
 export const getStoreData = (type) => async (dispatch) => {

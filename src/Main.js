@@ -59,6 +59,9 @@ function Main() {
     author: "",
   });
 
+  useEffect(() => {
+    console.log(markers);
+  }, [markers]);
   // 評価追加モーダルを開く
   const handleRatingModalOpen = () => {
     setRatingModalOpen(true);
@@ -133,18 +136,21 @@ function Main() {
 
   const handleEditRate = (value, info) => {
     console.log(currentEditRate);
+    console.log(value, info);
     axios
-      .put(`https://json.jhpdev.xyz/rate/${currentEditRate.id}`, {
-        address_id: info.address_id,
-        value: value.value,
-        password: info.password,
-        nickname: "匿名の男",
-        name: value.content,
-        comment: value.comment,
-      })
+      .put(
+        `https://jhpdev.xyz/proxy/https://json.jhpdev.xyz/rate/${currentEditRate.id}`,
+        {
+          address_id: info.address_id,
+          value: value.value,
+          password: info.password,
+          nickname: "匿名の男",
+          name: info.content,
+          comment: value.comment,
+        }
+      )
       .then((res) => {
-        alert("修正成功");
-        getRate(info.address_id);
+        getRateByName(info.content);
         handleRatingEditClose();
       })
       .catch((err) => {
@@ -173,35 +179,21 @@ function Main() {
       });
   };
 
-  // 店舗IDで評価データを取得
-  const getRate = (address_id) => {
+  // 店舗名で評価データを取得
+  const getRateByName = (name) => {
+    console.log(name);
     axios
-      .get(`https://json.jhpdev.xyz/rate?address_id=${address_id}`)
+      .get(`https://jhpdev.xyz/proxy/https://json.jhpdev.xyz/rate?name=${name}`)
       .then((res) => {
-        console.log("評価データ:", res.data);
+        console.log("名前による評価データ:", res.data);
         let sum = 0;
         res.data.map((rate) => {
           sum += rate.value;
         });
-
-        setSum(sum);
         setRates(res.data);
+        setSum(sum);
         setCount(res.data.length);
       });
-  };
-
-  // 店舗名で評価データを取得
-  const getRateByName = (name) => {
-    axios.get(`https://json.jhpdev.xyz/rate?name=${name}`).then((res) => {
-      console.log("名前による評価データ:", res.data);
-      let sum = 0;
-      res.data.map((rate) => {
-        sum += rate.value;
-      });
-      setRates(res.data);
-      setSum(sum);
-      setCount(res.data.length);
-    });
   };
 
   // テーブルから選択された店舗を地図で検索
@@ -248,18 +240,18 @@ function Main() {
 
   // 評価を送信する関数
   const submitRating = async (newRating, info) => {
+    console.log(newRating, info);
     axios
-      .post("https://json.jhpdev.xyz/rate", {
+      .post("https://jhpdev.xyz/proxy/https://json.jhpdev.xyz/rate", {
         address_id: info.address_id,
+        name: info.content,
         value: newRating.rating,
         password: 5,
-        nickname: "謎の男",
+        nickname: newRating.name,
         comment: newRating.comment,
-        name: newRating.author,
       })
       .then((res) => {
-        alert("成功");
-        getRate(info.address_id);
+        getRateByName(info.content);
         setRatingModalOpen(false);
       })
       .catch((err) => {
@@ -335,6 +327,7 @@ function Main() {
                 data={data}
                 mapSearch={mapSearch}
                 getRate={getRateByName}
+                onRowClick={(rate) => getRateByName}
               />
             ) : (
               <h1 className="loading">データがありません</h1>
@@ -362,7 +355,7 @@ function Main() {
                 position={marker.position}
                 onClick={() => {
                   setInfo(marker);
-                  getRate(marker.address_id);
+                  getRateByName(marker.content);
                 }}
                 image={{
                   src: markerImg,
@@ -591,22 +584,6 @@ function Main() {
 
                 {/* フォーム内容 */}
                 <div className="space-y-6">
-                  {/* 名前入力 */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      お名前
-                    </label>
-                    <input
-                      type="text"
-                      value={newRating.author}
-                      onChange={(e) =>
-                        setNewRating({ ...newRating, author: e.target.value })
-                      }
-                      placeholder="お名前を入力してください"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    />
-                  </div>
-
                   {/* 評価選択 */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">
