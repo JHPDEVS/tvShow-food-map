@@ -1,39 +1,33 @@
-import { useState, Fragment, useEffect } from 'react'
-import * as React from 'react'
-import axios from 'axios'
-import { useDispatch } from 'react-redux'
-import { Dialog, Transition } from '@headlessui/react'
-import { Rating } from '@mui/material'
+import { useState, Fragment, useEffect } from "react";
+import * as React from "react";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { Dialog, Transition } from "@headlessui/react";
+import { Rating } from "@mui/material";
 function RatingModal(props) {
-  const [ratingValue, setRatingValue] = useState()
-  const [nickname, setNickName] = useState('천세백세준')
-  const [comment, setComment] = useState('리뷰를 남겨주세요')
-  const [password, setPassword] = useState(5)
+  const [ratingValue, setRatingValue] = useState();
+  const [nickname, setNickName] = useState("謎の男");
+  const [comment, setComment] = useState("");
+  const [password, setPassword] = useState(5);
   const addRate = () => {
     axios
-      .post('https://api.2park.shop/rate', {
+      .post("https://json.jhpdev.xyz/rate", {
         address_id: props.value.address_id,
         value: ratingValue,
         password: password,
-        nickname: '익명의 사나이',
+        nickname: "謎の男",
         comment: comment,
         name: props.value.content,
       })
-      .then(res => {
-        alert('성공')
-        props.getRate(props.value.address_id)
-        props.handleClose()
+      .then((res) => {
+        props.getRate(props.value.address_id);
+        props.handleClose();
       })
-      .catch(err => {
-        alert(err)
-      })
-  }
+      .catch((err) => {
+        alert(err);
+      });
+  };
 
-  useEffect(() => {
-    return () => {
-      console.log('타이핑')
-    }
-  }, [comment])
   return (
     <Transition appear show={props.open} as={Fragment}>
       <Dialog
@@ -94,7 +88,7 @@ function RatingModal(props) {
               </div>
               <div className="mx-auto">
                 <div className="font-bold text-xl p-2 oveflow-x-auto">
-                  별점주기
+                  評価する
                 </div>
                 <div className="flex flex-col overflow-y-auto h-96 px-2">
                   <article>
@@ -103,11 +97,11 @@ function RatingModal(props) {
                         name="simple-controlled"
                         value={ratingValue}
                         onChange={(event, newValue) => {
-                          setRatingValue(newValue)
+                          setRatingValue(newValue);
                         }}
                       />
                       <h3 class="ml-2 text-sm font-semibold text-gray-900 dark:text-white">
-                        {ratingValue}개
+                        {ratingValue}個
                       </h3>
                     </div>
 
@@ -119,11 +113,11 @@ function RatingModal(props) {
                         id="editor"
                         rows="8"
                         class="block px-0 w-full text-sm text-gray-800 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
-                        placeholder="코멘트를 입력해주세요"
+                        placeholder="コメントを入力してください"
                         required
                         value={comment}
-                        onChange={event => {
-                          setComment(event.target.value)
+                        onChange={(event) => {
+                          setComment(event.target.value);
                         }}
                       ></textarea>
                     </div>
@@ -135,7 +129,7 @@ function RatingModal(props) {
                   onClick={() => addRate()}
                   className=" px-4 py-2 text-sm font-medium text-red-900 bg-red-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                 >
-                  보내기
+                  送る
                 </button>
               </div>
             </div>
@@ -143,6 +137,6 @@ function RatingModal(props) {
         </div>
       </Dialog>
     </Transition>
-  )
+  );
 }
-export default RatingModal
+export default RatingModal;

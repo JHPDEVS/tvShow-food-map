@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import {
   useTable,
   useFilters,
@@ -6,29 +6,29 @@ import {
   useAsyncDebounce,
   useSortBy,
   usePagination,
-} from 'react-table'
+} from "react-table";
 import {
   ChevronDoubleLeftIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronDoubleRightIcon,
   CogIcon,
-} from '@heroicons/react/solid'
-import { Button, PageButton } from './shared/Button'
-import { classNames } from './shared/Utils'
-import { SortIcon, SortUpIcon, SortDownIcon } from './shared/Icons'
-import './dist/output.css'
+} from "@heroicons/react/solid";
+import { Button, PageButton } from "./shared/Button";
+import { classNames } from "./shared/Utils";
+import { SortIcon, SortUpIcon, SortDownIcon } from "./shared/Icons";
+import "./dist/output.css";
 // Define a default UI for filtering
 function GlobalFilter({
   preGlobalFilteredRows,
   globalFilter,
   setGlobalFilter,
 }) {
-  const count = preGlobalFilteredRows.length
-  const [value, setValue] = React.useState(globalFilter)
-  const onChange = useAsyncDebounce(value => {
-    setGlobalFilter(value || undefined)
-  }, 200)
+  const count = preGlobalFilteredRows.length;
+  const [value, setValue] = React.useState(globalFilter);
+  const onChange = useAsyncDebounce((value) => {
+    setGlobalFilter(value || undefined);
+  }, 200);
   return (
     <div class="mx-3 mt-3">
       <div class="relative text-gray-600">
@@ -48,16 +48,16 @@ function GlobalFilter({
         <input
           type="text"
           className="block w-full py-2 pl-10 bg-gray-100 rounded outline-none"
-          value={value || ''}
-          onChange={e => {
-            setValue(e.target.value)
-            onChange(e.target.value)
+          value={value || ""}
+          onChange={(e) => {
+            setValue(e.target.value);
+            onChange(e.target.value);
           }}
           placeholder={`${count} 개의 가게가 있습니다.`}
         />
       </div>
     </div>
-  )
+  );
 }
 
 // This is a custom filter UI for selecting
@@ -68,24 +68,24 @@ export function SelectColumnFilter({
   // Calculate the options for filtering
   // using the preFilteredRows
   const options = React.useMemo(() => {
-    const options = new Set()
-    preFilteredRows.forEach(row => {
-      options.add(row.values[id])
-    })
-    return [...options.values()]
-  }, [id, preFilteredRows])
+    const options = new Set();
+    preFilteredRows.forEach((row) => {
+      options.add(row.values[id]);
+    });
+    return [...options.values()];
+  }, [id, preFilteredRows]);
 
   // Render a multi-select box
   return (
     <label className="flex gap-x-2 items-baseline">
-      <span className="text-gray-700">{render('Header')}: </span>
+      <span className="text-gray-700">{render("Header")}: </span>
       <select
         className="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
         name={id}
         id={id}
         value={filterValue}
-        onChange={e => {
-          setFilter(e.target.value || undefined)
+        onChange={(e) => {
+          setFilter(e.target.value || undefined);
         }}
       >
         <option value="">All</option>
@@ -96,24 +96,24 @@ export function SelectColumnFilter({
         ))}
       </select>
     </label>
-  )
+  );
 }
 
 export function StatusPill({ value }) {
-  const status = value ? value.toLowerCase() : 'unknown'
+  const status = value ? value.toLowerCase() : "unknown";
 
   return (
     <span
       className={classNames(
-        'px-3 py-1 uppercase leading-wide font-bold text-xs rounded-full shadow-sm',
-        status.startsWith('active') ? 'bg-green-100 text-green-800' : null,
-        status.startsWith('inactive') ? 'bg-yellow-100 text-yellow-800' : null,
-        status.startsWith('offline') ? 'bg-red-100 text-red-800' : null
+        "px-3 py-1 uppercase leading-wide font-bold text-xs rounded-full shadow-sm",
+        status.startsWith("active") ? "bg-green-100 text-green-800" : null,
+        status.startsWith("inactive") ? "bg-yellow-100 text-yellow-800" : null,
+        status.startsWith("offline") ? "bg-red-100 text-red-800" : null
       )}
     >
       {status}
     </span>
-  )
+  );
 }
 
 export function AvatarCell({ value, column, row }) {
@@ -133,7 +133,7 @@ export function AvatarCell({ value, column, row }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function Table({ columns, data, mapSearch, getRate }) {
@@ -168,7 +168,7 @@ function Table({ columns, data, mapSearch, getRate }) {
     useGlobalFilter,
     useSortBy,
     usePagination // new
-  )
+  );
 
   // Render the UI for your table
   return (
@@ -179,11 +179,11 @@ function Table({ columns, data, mapSearch, getRate }) {
           globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
-        {headerGroups.map(headerGroup =>
-          headerGroup.headers.map(column =>
+        {headerGroups.map((headerGroup) =>
+          headerGroup.headers.map((column) =>
             column.Filter ? (
               <div className="mt-2 sm:mt-0" key={column.id}>
-                {column.render('Filter')}
+                {column.render("Filter")}
               </div>
             ) : null
           )
@@ -196,9 +196,9 @@ function Table({ columns, data, mapSearch, getRate }) {
           className="mt-2 w-full table-fixed  text-center text-gray-500 dark:text-gray-400"
         >
           <thead className="bg-gray-50 sticky top-0">
-            {headerGroups.map(headerGroup => (
+            {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map(column => (
+                {headerGroup.headers.map((column) => (
                   // Add the sorting props to control sorting. For this example
                   // we can add them into the header props
                   <th
@@ -207,7 +207,7 @@ function Table({ columns, data, mapSearch, getRate }) {
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                   >
                     <div className="flex items-center justify-between">
-                      {column.render('Header')}
+                      {column.render("Header")}
                       {/* Add a sort direction indicator */}
                       <span>
                         {column.isSorted ? (
@@ -233,35 +233,35 @@ function Table({ columns, data, mapSearch, getRate }) {
           >
             {page.map((row, i) => {
               // new
-              prepareRow(row)
+              prepareRow(row);
               return (
                 <tr
                   className="bg-white dark:bg-gray-800"
                   {...row.getRowProps()}
                   onClick={() => {
-                    mapSearch(row)
-                    getRate(row.original.가게명)
+                    mapSearch(row);
+                    getRate(row.original.가게명_jp);
                   }}
                 >
-                  {row.cells.map(cell => {
+                  {row.cells.map((cell) => {
                     return (
                       <td
                         {...cell.getCellProps()}
                         className=" rounded-r-lg"
                         role="cell"
                       >
-                        {cell.column.Cell.name === 'defaultRenderer' ? (
+                        {cell.column.Cell.name === "defaultRenderer" ? (
                           <span className="text-sm text-gray-500">
-                            {cell.render('Cell')}
+                            {cell.render("Cell")}
                           </span>
                         ) : (
-                          cell.render('Cell')
+                          cell.render("Cell")
                         )}
                       </td>
-                    )
+                    );
                   })}
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
@@ -279,8 +279,8 @@ function Table({ columns, data, mapSearch, getRate }) {
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div className="flex items-baseline">
             <span className="text-sm text-gray-700 p-2">
-              <span className="font-medium">{state.pageIndex + 1}페이지</span> /{' '}
-              <span className="font-medium">{pageOptions.length}페이지</span>
+              <span className="font-medium">{state.pageIndex + 1}ページ</span> /{" "}
+              <span className="font-medium">{pageOptions.length}ページ</span>
             </span>
           </div>
           <div>
@@ -332,7 +332,7 @@ function Table({ columns, data, mapSearch, getRate }) {
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default Table
+export default Table;
