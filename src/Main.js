@@ -9,7 +9,7 @@ import { Map, MapMarker } from "react-kakao-maps-sdk";
 import Table from "./Table";
 import markerImg from "./img/marker_yju.png";
 import YouTube from "react-youtube";
-import { comment } from "postcss";
+import { Menu, X } from "lucide-react";
 
 function Main() {
   // 表示状態の管理
@@ -24,6 +24,8 @@ function Main() {
   const [ratingCheckOpen, setRatingCheckOpen] = useState(false);
   // 評価編集モーダルの開閉状態
   const [ratingEditOpen, setRatingEditOpen] = useState(false);
+  // モバイル用サイドバー表示状態
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Reduxから店舗データを取得
   const stores = useSelector((state) => state.Reducers.stores);
@@ -226,6 +228,10 @@ function Main() {
           }
           setMarkers(markers);
           map.setBounds(bounds);
+          // モバイル에서 검색 후 사이드바 닫기
+          if (window.innerWidth < 1024) {
+            setSidebarOpen(false);
+          }
         } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
           alert("検索結果が存在しません。");
           return;
@@ -267,7 +273,7 @@ function Main() {
         {[1, 2, 3, 4, 5].map((star) => (
           <svg
             key={star}
-            className={`w-6 h-6 ${
+            className={`w-5 h-5 sm:w-6 sm:h-6 ${
               readonly ? "" : "cursor-pointer"
             } transition-colors ${
               star <= rating ? "text-yellow-400 fill-current" : "text-gray-300"
@@ -316,11 +322,43 @@ function Main() {
   }, [stores]);
 
   return (
-    <div className="mx-auto h-screen overflow-hidden">
-      <div className="min-w-full border rounded lg:grid lg:grid-cols-3">
-        {/* 左側のテーブル部分 */}
-        <div className="border-r border-gray-300 lg:col-span-1">
-          <div>
+    <div className="h-screen overflow-hidden bg-gray-50">
+      {/* モバイル用ヘッダー */}
+      <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <h1 className="text-lg font-semibold text-gray-900">店舗検索</h1>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+        >
+          {sidebarOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
+        </button>
+      </div>
+
+      <div className="flex h-full lg:h-screen">
+        {/* サイドバー（テーブル部分） */}
+        <div
+          className={`
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0 lg:static lg:inset-0
+          fixed inset-y-0 left-0 z-50 w-full sm:w-80 lg:w-1/3
+          bg-white border-r border-gray-300
+          transform transition-transform duration-300 ease-in-out
+          flex flex-col
+        `}
+        >
+          {/* モバイル用オーバーレイ */}
+          {sidebarOpen && (
+            <div
+              className="lg:hidden fixed inset-0 bg-black bg-opacity-25 z-40"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
+
+          <div className="flex-1 overflow-hidden relative z-50">
             {stores != null ? (
               <Table
                 columns={columns}
@@ -330,13 +368,15 @@ function Main() {
                 onRowClick={(rate) => getRateByName}
               />
             ) : (
-              <h1 className="loading">データがありません</h1>
+              <div className="flex items-center justify-center h-full">
+                <h1 className="text-gray-500">データがありません</h1>
+              </div>
             )}
           </div>
         </div>
 
-        {/* 右側の地図部分 */}
-        <div className="col-span-2 h-screen w-full">
+        {/* 地図部分 */}
+        <div className="flex-1 relative">
           <Map
             center={{
               lat: 35.9690372,
@@ -372,7 +412,7 @@ function Main() {
                 }}
               >
                 {info && info.address_id === marker.address_id && (
-                  <div className="w-96 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden relative">
+                  <div className="w-80 sm:w-96 bg-white rounded border-4 shadow-2xl overflow-hidden relative max-h-[80vh] overflow-y-auto">
                     <button
                       onClick={() => setInfo(null)}
                       className="absolute top-4 right-4 z-10 p-2 bg-white hover:bg-gray-100 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110"
@@ -399,7 +439,7 @@ function Main() {
                           videoId={youtubeURL}
                           opts={{
                             width: "100%",
-                            height: "200",
+                            height: "180",
                             playerVars: {
                               autoplay: 0,
                               rel: 0,
@@ -414,12 +454,12 @@ function Main() {
                     )}
                     {youtubeSearch(`${typeValue} ${marker.content} `)}
 
-                    <div className="p-6">
+                    <div className="p-4 sm:p-6">
                       {/* 店舗名とアイコン */}
                       <div className="flex items-center gap-3 mb-4">
                         <div className="p-2 bg-red-100 rounded-full">
                           <svg
-                            className="w-5 h-5 text-red-600"
+                            className="w-4 h-4 sm:w-5 sm:h-5 text-red-600"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -438,23 +478,23 @@ function Main() {
                             />
                           </svg>
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 pr-8">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 pr-8 leading-tight">
                           {marker.content}
                         </h3>
                       </div>
 
                       {/* 評価表示部分 */}
-                      <div className="flex items-center gap-3 mb-4 p-3 bg-yellow-50 rounded-lg">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-4 p-3 bg-yellow-50 rounded-lg">
                         <StarRating
                           rating={count > 0 ? Math.round(sum / count) : 0}
                           readonly={true}
                         />
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-gray-900">
+                          <span className="text-base sm:text-lg font-bold text-gray-900">
                             {count > 0 ? (sum / count).toFixed(1) : "未評価"}
                           </span>
                           <span className="px-2 py-1 bg-yellow-200 text-yellow-800 text-xs font-medium rounded-full">
-                            {count}件の評価
+                            {count}件
                           </span>
                         </div>
                       </div>
@@ -470,7 +510,7 @@ function Main() {
                       <div className="space-y-3 mb-6 text-sm text-gray-600">
                         <div className="flex items-start gap-3">
                           <svg
-                            className="w-4 h-4 mt-0.5 text-gray-400"
+                            className="w-4 h-4 mt-0.5 text-gray-400 flex-shrink-0"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -482,14 +522,14 @@ function Main() {
                               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
                             />
                           </svg>
-                          <span className="leading-relaxed">
+                          <span className="leading-relaxed break-words">
                             {marker.address_name}
                           </span>
                         </div>
                         {marker.phone && (
                           <div className="flex items-center gap-3">
                             <svg
-                              className="w-4 h-4 text-gray-400"
+                              className="w-4 h-4 text-gray-400 flex-shrink-0"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -507,16 +547,16 @@ function Main() {
                       </div>
 
                       {/* アクションボタン */}
-                      <div className="flex gap-3 mb-4">
+                      <div className="flex flex-col sm:flex-row gap-3 mb-4">
                         <button
                           onClick={handleRatingModalOpen}
-                          className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+                          className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg text-sm sm:text-base"
                         >
                           評価を付ける
                         </button>
                         <button
                           onClick={() => setRatingCheckOpen(true)}
-                          className="flex-1 bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:bg-gray-50"
+                          className="flex-1 bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:bg-gray-50 text-sm sm:text-base"
                         >
                           評価を確認
                         </button>
@@ -527,7 +567,7 @@ function Main() {
                         href={marker.place_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105"
+                        className="w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
                       >
                         <svg
                           className="w-4 h-4"
@@ -556,10 +596,10 @@ function Main() {
         {ratingModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {/* モーダルヘッダー */}
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     評価を追加
                   </h2>
                   <button
@@ -611,21 +651,21 @@ function Main() {
                       }
                       placeholder="お店の感想をお聞かせください"
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm sm:text-base"
                     />
                   </div>
 
                   {/* ボタン */}
-                  <div className="flex gap-3 pt-4">
+                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
                     <button
                       onClick={() => submitRating(newRating, info)}
-                      className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105"
+                      className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
                     >
                       評価を送信
                     </button>
                     <button
                       onClick={handleRatingModalClose}
-                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-all duration-200"
+                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-all duration-200 text-sm sm:text-base"
                     >
                       キャンセル
                     </button>
@@ -640,10 +680,12 @@ function Main() {
         {ratingCheckOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {/* モーダルヘッダー */}
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">評価一覧</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                    評価一覧
+                  </h2>
                   <button
                     onClick={handleRatingCheckClose}
                     className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -672,21 +714,21 @@ function Main() {
                         key={index}
                         className="bg-gray-50 rounded-xl p-4 border border-gray-200"
                       >
-                        <div className="flex justify-between items-start mb-3">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-3">
                           <div className="flex items-center gap-3">
                             <StarRating rating={rate.value} readonly={true} />
-                            <span className="font-medium text-gray-900">
+                            <span className="font-medium text-gray-900 text-sm sm:text-base">
                               {rate.author || "匿名"}
                             </span>
                           </div>
                           <button
                             onClick={() => handleRatingEditOpen(rate)}
-                            className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors self-start"
                           >
                             編集
                           </button>
                         </div>
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
                           {rate.comment}
                         </p>
                       </div>
@@ -726,10 +768,10 @@ function Main() {
         {ratingEditOpen && currentEditRate && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {/* モーダルヘッダー */}
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     評価を編集
                   </h2>
                   <button
@@ -784,21 +826,21 @@ function Main() {
                           comment: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm sm:text-base"
                     />
                   </div>
 
                   {/* ボタン */}
-                  <div className="flex gap-3 pt-4">
+                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
                     <button
-                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105"
+                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
                       onClick={() => handleEditRate(currentEditRate, info)}
                     >
                       更新
                     </button>
                     <button
                       onClick={handleRatingEditClose}
-                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-all duration-200"
+                      className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg transition-all duration-200 text-sm sm:text-base"
                     >
                       キャンセル
                     </button>
